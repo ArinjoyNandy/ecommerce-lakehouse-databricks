@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+ENV/
+
+# Data Directories & Delta Lake Storage (Never commit data files)
+data/
+*.csv
+*.json
+*.parquet
+_delta_log/
+
+# IDE / Editor metadata
+.vscode/
+.idea/
+.DS_Store
+
+# Secrets and Environment Variables
+.env
+*credentials*
