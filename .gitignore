@@ -12,6 +12,8 @@ ENV/
 data/
 *.csv
 *.json
+!config/*.json
+!workflows/*.json
 *.parquet
 _delta_log/
 
