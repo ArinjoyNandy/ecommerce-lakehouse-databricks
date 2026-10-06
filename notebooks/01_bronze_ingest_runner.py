@@ -8,12 +8,17 @@ spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.{schema_name}")
 
 # COMMAND ----------
 
+# DBTITLE 1,Configure repository path and import ingestion module
 import sys
 import os
+import importlib
 
 repo_root = os.path.abspath("..")
 if repo_root not in sys.path:
     sys.path.append(repo_root)
+
+if "src.bronze.ingestion" in sys.modules:
+    importlib.reload(sys.modules["src.bronze.ingestion"])
 
 from src.bronze.ingestion import ingest_raw_csv_to_bronze
 
@@ -40,12 +45,6 @@ datasets = [
 # COMMAND ----------
 
 # DBTITLE 1,Execute batch ingestion
-# import sys
-# for key in list(sys.modules.keys()):
-#     if "ingestion" in key or (key.startswith("src") and "bronze" in key):
-#         del sys.modules[key]
-# from src.bronze.ingestion import ingest_raw_csv_to_bronze
-
 for item in datasets:
     print(f"Ingesting {item['source']} -> {item['target']} ...")
     rows_loaded = ingest_raw_csv_to_bronze(
