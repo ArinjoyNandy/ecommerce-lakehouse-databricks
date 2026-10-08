@@ -3,11 +3,13 @@
 # [tool.databricks.environment]
 # environment_version = "6"
 # ///
+# DBTITLE 1,Create Silver Schema
 catalog_name = "ecommerce_dev"
 spark.sql(f"CREATE SCHEMA IF NOT EXISTS {catalog_name}.silver")
 
 # COMMAND ----------
 
+# DBTITLE 1,Configure Imports and Reload Silver Cleaning Modules
 import sys
 import os
 import importlib
@@ -27,6 +29,7 @@ from src.silver.cdc_engine import upsert_orders_silver, overwrite_silver_table
 
 # COMMAND ----------
 
+# DBTITLE 1,Transform Bronze Data into Silver Schema
 # 1. Read Bronze tables
 bronze_orders = spark.read.table(f"{catalog_name}.bronze.raw_orders")
 bronze_items = spark.read.table(f"{catalog_name}.bronze.raw_order_items")
@@ -39,6 +42,7 @@ silver_custs_df = clean_customers_data(bronze_custs)
 
 # COMMAND ----------
 
+# DBTITLE 1,Merge Orders and Write Dimension Tables
 # 3. Apply CDC Merge to Orders
 orders_target = f"{catalog_name}.silver.orders"
 print("upserting orders into {orders_target}...")
@@ -53,9 +57,11 @@ overwrite_silver_table(custs_target, silver_custs_df)
 
 # COMMAND ----------
 
+# DBTITLE 1,Display Delta Table History for Orders
 # 5. Delta Validation
 display(spark.sql(f"DESCRIBE HISTORY {orders_target}"))
 
 # COMMAND ----------
 
+# DBTITLE 1,Exit notebook with success status for workflows
 dbutils.notebook.exit("SUCCESS: Silver CDC and Cleansing complete.")
