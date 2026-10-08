@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "6"
+# ///
 # DBTITLE 1,Setup namespace parameters
 catalog_name = "ecommerce_dev"
 schema_name = "bronze"

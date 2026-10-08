@@ -23,7 +23,7 @@ def ingest_raw_csv_to_bronze(
     # 2. Append operational metadata (lineage and audit trail)
     df_bronze = (
         df_raw
-        .withColumn("_ingeated_at", F.current_timestamp())
+        .withColumn("_ingested_at", F.current_timestamp())
         .withColumn("_source_file", F.col("_metadata.file_path"))
     ) 
 
