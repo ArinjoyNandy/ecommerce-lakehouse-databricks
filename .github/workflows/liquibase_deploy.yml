@@ -1,0 +1,52 @@
+name: Liquibase Databricks CI/CD
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'src/datablocks/**'
+      - 'src/datamarts/**'
+      - 'src/maintenance/**'
+  # Allows manual triggering from the GitHub Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy-gold-layer:
+    name: Deploy Gold DDL to Databricks
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java Runtime
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Install Liquibase CLI
+        run: |
+          wget -qO- https://repo.liquibase.com/liquibase.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/liquibase.gpg
+          echo "deb [arch=amd64] https://repo.liquibase.com stable main" | sudo tee /etc/apt/sources.list.d/liquibase.list
+          sudo apt-get update && sudo apt-get install -y liquibase
+
+      - name: Download Databricks JDBC Driver
+        run: |
+          sudo mkdir -p /opt/liquibase/lib
+          sudo curl -L -o /opt/liquibase/lib/DatabricksJDBC42.jar \
+            https://databricks-bi-artifacts.s3.us-east-2.amazonaws.com/simbaspark-drivers/jdbc/2.6.36/DatabricksJDBC42.jar
+
+      - name: Execute Liquibase Migrations
+        env:
+          DATABRICKS_JDBC_URL: ${{ secrets.DATABRICKS_JDBC_URL }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+        run: |
+          liquibase \
+            --url="${DATABRICKS_JDBC_URL}" \
+            --username="token" \
+            --password="${DATABRICKS_TOKEN}" \
+            --driver="com.databricks.client.jdbc.Driver" \
+            --changelog-file="src/datablocks/schema_changes/datablock.changelog.yml" \
+            update
