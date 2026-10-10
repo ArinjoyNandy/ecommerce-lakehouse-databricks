@@ -18,7 +18,7 @@ databaseChangeLog:
   - changeSet:
       id: 001-create-gold-schema
       author: ecommerce-lakehouse
-      runAlways: true
+      runOnChange: true
       comment: Create ecommerce_dev.gold schema for datablock materialized views
       changes:
         - sqlFile:
@@ -31,8 +31,7 @@ databaseChangeLog:
   - changeSet:
       id: 002-create-mv-datablock-customer-360
       author: ecommerce-lakehouse
-      runAlways: true
-    #   runOnChange: true
+      runOnChange: true
       comment: RFM segmentation and lifetime spend per customer
       preConditions:
         - onFail: MARK_RAN
@@ -59,8 +58,7 @@ databaseChangeLog:
   - changeSet:
       id: 003-create-mv-datablock-sales-order-lineage
       author: ecommerce-lakehouse
-      runAlways: true
-    #   runOnChange: true
+      runOnChange: true
       comment: Enriched order line-item lineage with SLA, financial, and geo attributes
       preConditions:
         - onFail: MARK_RAN
