@@ -1,0 +1,81 @@
+# Liquibase Changelog — Datablocks (Gold Layer)
+#
+# Manages schema and materialized view definitions for the curated
+# datablock layer in ecommerce_dev.gold.
+#
+# Changeset ordering:
+#   001  Create the gold schema
+#   002  Create mv_datablock_customer_360
+#   003  Create mv_datablock_sales_order_lineage
+#
+# Dependencies:
+#   MVs require the silver tables (orders, order_items, customers)
+#   to exist before they can be created.
+
+databaseChangeLog:
+
+  # ── 001 · Create gold schema ───────────────────────────────────
+  - changeSet:
+      id: 001-create-gold-schema
+      author: ecommerce-lakehouse
+      runOnChange: true
+      comment: Create ecommerce_dev.gold schema for datablock materialized views
+      changes:
+        - sqlFile:
+            path: CREATE_SCHEMA.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+
+  # ── 002 · Customer 360 materialized view ───────────────────────
+  #    Pre-requisite: silver.customers, silver.orders, silver.order_items
+  - changeSet:
+      id: 002-create-mv-datablock-customer-360
+      author: ecommerce-lakehouse
+      runOnChange: true
+      comment: RFM segmentation and lifetime spend per customer
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: silver
+            tableName: customers
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: silver
+            tableName: orders
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: silver
+            tableName: order_items
+      changes:
+        - sqlFile:
+            path: ../mv_datablock_customer_360.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+
+  # ── 003 · Sales Order Lineage materialized view ────────────────
+  #    Pre-requisite: silver.orders, silver.order_items, silver.customers
+  - changeSet:
+      id: 003-create-mv-datablock-sales-order-lineage
+      author: ecommerce-lakehouse
+      runOnChange: true
+      comment: Enriched order line-item lineage with SLA, financial, and geo attributes
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: silver
+            tableName: orders
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: silver
+            tableName: order_items
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: silver
+            tableName: customers
+      changes:
+        - sqlFile:
+            path: ../mv_datablock_sales_order_lineage.sql
+            relativeToChangelogFile: true
+            splitStatements: false
