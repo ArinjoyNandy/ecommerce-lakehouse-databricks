@@ -28,21 +28,32 @@ jobs:
 
       - name: Install Liquibase (Direct Binary)
         run: |
-          # 1. Download official Liquibase archive
+          # 1. Download official Liquibase tarball
           curl -fsSL https://github.com/liquibase/liquibase/releases/download/v4.29.2/liquibase-4.29.2.tar.gz -o /tmp/liquibase.tar.gz
           
-          # 2. Extract into /opt/liquibase and create global symlink
+          # 2. Extract into /opt/liquibase and link executable
           sudo mkdir -p /opt/liquibase
           sudo tar -xzf /tmp/liquibase.tar.gz -C /opt/liquibase
           sudo ln -sf /opt/liquibase/liquibase /usr/local/bin/liquibase
           
-          # 3. Verify installation
+          # 3. Verify CLI version
           liquibase --version
 
-      - name: Download Databricks JDBC Driver
+      - name: Download & Extract Databricks JDBC Driver
         run: |
-          sudo curl -L -o /opt/liquibase/lib/DatabricksJDBC42.jar \
-            https://databricks-bi-artifacts.s3.us-east-2.amazonaws.com/simbaspark-drivers/jdbc/2.6.36/DatabricksJDBC42.jar
+          # 1. Download official Databricks driver ZIP with fail-fast flag (-fSL)
+          DRIVER_URL="https://databricks-bi-artifacts.s3.us-east-2.amazonaws.com/simbaspark-drivers/jdbc/2.6.36/DatabricksJDBC42-2.6.36.1062.zip"
+          curl -fSL "$DRIVER_URL" -o /tmp/driver.zip
+          
+          # 2. Unzip into temp folder
+          unzip -q /tmp/driver.zip -d /tmp/driver_extracted
+          
+          # 3. Locate the actual JAR and place it into Liquibase's lib directory
+          sudo mkdir -p /opt/liquibase/lib
+          sudo find /tmp/driver_extracted -name "*DatabricksJDBC*.jar" -exec cp {} /opt/liquibase/lib/DatabricksJDBC42.jar \;
+          
+          # 4. Verify JAR exists and print file size (should be ~35-40 MB)
+          ls -lh /opt/liquibase/lib/DatabricksJDBC42.jar
 
       - name: Execute Liquibase Migrations
         env:
