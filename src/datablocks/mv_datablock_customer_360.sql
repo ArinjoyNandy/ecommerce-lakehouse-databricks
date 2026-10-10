@@ -1,4 +1,5 @@
-CREATE OR REPLACE MATERIALIZED VIEW ecommerce_dev.gold.mv_datablock_customer_360
+CREATE OR REPLACE TABLE ecommerce_dev.gold.datablock_customer_360
+USING DELTA
     COMMENT 'Curated customer dimension joining orders and items to pre-compute RFM segmentation and lifetime spend'
 AS
     WITH customer_base AS (

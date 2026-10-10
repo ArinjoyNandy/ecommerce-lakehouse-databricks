@@ -1,4 +1,5 @@
-CREATE OR REPLACE MATERIALIZED VIEW ecommerce_dev.gold.mv_datablock_sales_order_lineage
+CREATE OR REPLACE TABLE ecommerce_dev.gold.datablock_sales_order_lineage
+USING DELTA
     COMMENT 'Enriched order line-item lineage joining orders, items, and customers with pre-derived SLA, financial, and geographical attributes'
 AS
     WITH dedup_orders AS(
