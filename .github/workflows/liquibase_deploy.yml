@@ -8,6 +8,7 @@ on:
       - 'src/datablocks/**'
       - 'src/datamarts/**'
       - 'src/maintenance/**'
+      - '.github/workflows/**'
   workflow_dispatch:
 
 jobs:
@@ -25,16 +26,21 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Install Liquibase CLI
+      - name: Install Liquibase (Direct Binary)
         run: |
-          # Use sudo tee instead of '>' to prevent permission denied
-          wget -qO- https://repo.liquibase.com/liquibase.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/liquibase.gpg > /dev/null
-          echo "deb [arch=amd64] https://repo.liquibase.com stable main" | sudo tee /etc/apt/sources.list.d/liquibase.list
-          sudo apt-get update && sudo apt-get install -y liquibase
+          # 1. Download official Liquibase archive
+          curl -fsSL https://github.com/liquibase/liquibase/releases/download/v4.29.2/liquibase-4.29.2.tar.gz -o /tmp/liquibase.tar.gz
+          
+          # 2. Extract into /opt/liquibase and create global symlink
+          sudo mkdir -p /opt/liquibase
+          sudo tar -xzf /tmp/liquibase.tar.gz -C /opt/liquibase
+          sudo ln -sf /opt/liquibase/liquibase /usr/local/bin/liquibase
+          
+          # 3. Verify installation
+          liquibase --version
 
       - name: Download Databricks JDBC Driver
         run: |
-          sudo mkdir -p /opt/liquibase/lib
           sudo curl -L -o /opt/liquibase/lib/DatabricksJDBC42.jar \
             https://databricks-bi-artifacts.s3.us-east-2.amazonaws.com/simbaspark-drivers/jdbc/2.6.36/DatabricksJDBC42.jar
 
