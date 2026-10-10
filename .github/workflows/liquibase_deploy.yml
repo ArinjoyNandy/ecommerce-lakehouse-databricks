@@ -8,7 +8,6 @@ on:
       - 'src/datablocks/**'
       - 'src/datamarts/**'
       - 'src/maintenance/**'
-  # Allows manual triggering from the GitHub Actions tab
   workflow_dispatch:
 
 jobs:
@@ -28,7 +27,8 @@ jobs:
 
       - name: Install Liquibase CLI
         run: |
-          wget -qO- https://repo.liquibase.com/liquibase.asc | gpg --dearmor > /etc/apt/trusted.gpg.d/liquibase.gpg
+          # Use sudo tee instead of '>' to prevent permission denied
+          wget -qO- https://repo.liquibase.com/liquibase.asc | gpg --dearmor | sudo tee /etc/apt/trusted.gpg.d/liquibase.gpg > /dev/null
           echo "deb [arch=amd64] https://repo.liquibase.com stable main" | sudo tee /etc/apt/sources.list.d/liquibase.list
           sudo apt-get update && sudo apt-get install -y liquibase
 
@@ -44,6 +44,7 @@ jobs:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           liquibase \
+            --classpath="/opt/liquibase/lib/DatabricksJDBC42.jar" \
             --url="${DATABRICKS_JDBC_URL}" \
             --username="token" \
             --password="${DATABRICKS_TOKEN}" \
