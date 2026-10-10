@@ -39,21 +39,27 @@ jobs:
           # 3. Verify CLI version
           liquibase --version
 
-      - name: Download & Extract Databricks JDBC Driver
+      - name: Download Databricks JDBC Driver & Liquibase Extension
         run: |
-          # 1. Download official Databricks driver ZIP with fail-fast flag (-fSL)
+          sudo mkdir -p /opt/liquibase/lib
+
+          # 1. Download official Databricks Simba JDBC Driver ZIP
           DRIVER_URL="https://databricks-bi-artifacts.s3.us-east-2.amazonaws.com/simbaspark-drivers/jdbc/2.6.36/DatabricksJDBC42-2.6.36.1062.zip"
           curl -fSL "$DRIVER_URL" -o /tmp/driver.zip
-          
-          # 2. Unzip into temp folder
           unzip -q /tmp/driver.zip -d /tmp/driver_extracted
-          
-          # 3. Locate the actual JAR and place it into Liquibase's lib directory
-          sudo mkdir -p /opt/liquibase/lib
           sudo find /tmp/driver_extracted -name "*DatabricksJDBC*.jar" -exec cp {} /opt/liquibase/lib/DatabricksJDBC42.jar \;
-          
-          # 4. Verify JAR exists and print file size (should be ~35-40 MB)
-          ls -lh /opt/liquibase/lib/DatabricksJDBC42.jar
+
+          # 2. Download official Liquibase Databricks Extension (Resolves DATETIME -> TIMESTAMP dialect)
+          EXTENSION_VERSION=$(curl -fsSL https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-databricks/maven-metadata.xml | sed -n 's/.*<release>\(.*\)<\/release>.*/\1/p')
+          if [ -z "$EXTENSION_VERSION" ]; then
+            EXTENSION_VERSION="1.4.1"
+          fi
+          echo "Installing Liquibase Databricks extension version: $EXTENSION_VERSION"
+          sudo curl -fSL "https://repo1.maven.org/maven2/org/liquibase/ext/liquibase-databricks/${EXTENSION_VERSION}/liquibase-databricks-${EXTENSION_VERSION}.jar" \
+            -o /opt/liquibase/lib/liquibase-databricks.jar
+
+          # 3. Verify both JARs are present
+          ls -lh /opt/liquibase/lib/
 
       - name: Execute Liquibase Migrations
         env:
@@ -61,7 +67,7 @@ jobs:
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
           liquibase \
-            --classpath="/opt/liquibase/lib/DatabricksJDBC42.jar" \
+            --classpath="/opt/liquibase/lib/DatabricksJDBC42.jar:/opt/liquibase/lib/liquibase-databricks.jar" \
             --url="${DATABRICKS_JDBC_URL}" \
             --username="token" \
             --password="${DATABRICKS_TOKEN}" \
