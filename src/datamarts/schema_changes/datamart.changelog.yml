@@ -26,7 +26,7 @@ databaseChangeLog:
         - tableExists:
             catalogName: ecommerce_dev
             schemaName: gold
-            tableName: mv_datablock_sales_order_lineage
+            tableName: datablock_sales_order_lineage
       changes:
         - sqlFile:
             path: ../v_mart_daily_executive_sales.sql
@@ -44,7 +44,7 @@ databaseChangeLog:
         - tableExists:
             catalogName: ecommerce_dev
             schemaName: gold
-            tableName: mv_datablock_sales_order_lineage
+            tableName: datablock_sales_order_lineage
       changes:
         - sqlFile:
             path: ../v_mart_logistics_regional_sla.sql
@@ -62,7 +62,7 @@ databaseChangeLog:
         - tableExists:
             catalogName: ecommerce_dev
             schemaName: gold
-            tableName: mv_datablock_sales_order_lineage
+            tableName: datablock_sales_order_lineage
       changes:
         - sqlFile:
             path: ../v_mart_freight_leakage_analysis.sql
@@ -80,7 +80,7 @@ databaseChangeLog:
         - tableExists:
             catalogName: ecommerce_dev
             schemaName: gold
-            tableName: mv_datablock_customer_360
+            tableName: datablock_customer_360
       changes:
         - sqlFile:
             path: ../v_mart_customer_segment_summary.sql
@@ -98,7 +98,7 @@ databaseChangeLog:
         - tableExists:
             catalogName: ecommerce_dev
             schemaName: gold
-            tableName: mv_datablock_sales_order_lineage
+            tableName: datablock_sales_order_lineage
       changes:
         - sqlFile:
             path: ../v_mart_seller_fulfillment_efficiency.sql
@@ -116,7 +116,7 @@ databaseChangeLog:
         - tableExists:
             catalogName: ecommerce_dev
             schemaName: gold
-            tableName: mv_datablock_sales_order_lineage
+            tableName: datablock_sales_order_lineage
       changes:
         - sqlFile:
             path: ../v_mart_temporal_demand_profile.sql
