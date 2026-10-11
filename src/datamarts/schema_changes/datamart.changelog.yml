@@ -3,18 +3,6 @@
 
 databaseChangeLog:
 
-  # ── 100 · Create gold schema ───────────────────────────────────
-  - changeSet:
-      id: 100-create-gold-schema
-      author: ecommerce-lakehouse
-      runOnChange: true
-      comment: Create ecommerce_dev.gold schema for datablock materialized views
-      changes:
-        - sqlFile:
-            path: CREATE_SCHEMA.sql
-            relativeToChangelogFile: true
-            splitStatements: false
-
   # ── 101 · Daily Executive Sales Mart ───────────────────────────
   - changeSet:
       id: 101-create-v-mart-daily-executive-sales
