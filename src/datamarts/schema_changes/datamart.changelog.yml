@@ -1,0 +1,124 @@
+# Liquibase Changelog — DataMarts (Gold Reporting Views)
+# Source: Curated DataBlocks (mv_datablock_customer_360, mv_datablock_sales_order_lineage)
+
+databaseChangeLog:
+
+  # ── 100 · Create gold schema ───────────────────────────────────
+  - changeSet:
+      id: 100-create-gold-schema
+      author: ecommerce-lakehouse
+      runOnChange: true
+      comment: Create ecommerce_dev.gold schema for datablock materialized views
+      changes:
+        - sqlFile:
+            path: CREATE_SCHEMA.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+
+  # ── 101 · Daily Executive Sales Mart ───────────────────────────
+  - changeSet:
+      id: 101-create-v-mart-daily-executive-sales
+      author: ecommerce-lakehouse
+      runOnChange: true
+      comment: Aggregate daily sales KPIs from order lineage
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: gold
+            tableName: mv_datablock_sales_order_lineage
+      changes:
+        - sqlFile:
+            path: ../v_mart_daily_executive_sales.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+
+  # ── 102 · Regional Logistics & SLA Mart ─────────────────────────
+  - changeSet:
+      id: 102-create-v-mart-logistics-regional-sla
+      author: ecommerce-lakehouse
+      runOnChange: true
+      comment: Regional fulfillment lead times and SLA breaches
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: gold
+            tableName: mv_datablock_sales_order_lineage
+      changes:
+        - sqlFile:
+            path: ../v_mart_logistics_regional_sla.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+
+  # ── 103 · Freight Cost Leakage Mart ─────────────────────────────
+  - changeSet:
+      id: 103-create-v-mart-freight-leakage-analysis
+      author: ecommerce-lakehouse
+      runOnChange: true
+      comment: Shipping cost burden ratio per product price tier
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: gold
+            tableName: mv_datablock_sales_order_lineage
+      changes:
+        - sqlFile:
+            path: ../v_mart_freight_leakage_analysis.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+
+  # ── 104 · Customer Segment Summary Mart ─────────────────────────
+  - changeSet:
+      id: 104-create-v-mart-customer-segment-summary
+      author: ecommerce-lakehouse
+      runOnChange: true
+      comment: Aggregated customer count and spend by RFM cohort
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: gold
+            tableName: mv_datablock_customer_360
+      changes:
+        - sqlFile:
+            path: ../v_mart_customer_segment_summary.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+
+  # ── 105 · Seller Fulfillment Efficiency Mart ────────────────────
+  - changeSet:
+      id: 105-create-v-mart-seller-fulfillment-efficiency
+      author: ecommerce-lakehouse
+      runOnChange: true
+      comment: Merchant fulfillment performance and transit times
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: gold
+            tableName: mv_datablock_sales_order_lineage
+      changes:
+        - sqlFile:
+            path: ../v_mart_seller_fulfillment_efficiency.sql
+            relativeToChangelogFile: true
+            splitStatements: false
+
+  # ── 106 · Temporal Demand Profile Mart ──────────────────────────
+  - changeSet:
+      id: 106-create-v-mart-temporal-demand-profile
+      author: ecommerce-lakehouse
+      runOnChange: true
+      comment: Day of week and weekend purchasing distributions
+      preConditions:
+        - onFail: MARK_RAN
+        - tableExists:
+            catalogName: ecommerce_dev
+            schemaName: gold
+            tableName: mv_datablock_sales_order_lineage
+      changes:
+        - sqlFile:
+            path: ../v_mart_temporal_demand_profile.sql
+            relativeToChangelogFile: true
+            splitStatements: false
