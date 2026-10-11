@@ -66,6 +66,7 @@ jobs:
           DATABRICKS_JDBC_URL: ${{ secrets.DATABRICKS_JDBC_URL }}
           DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
         run: |
+          # 1. Deploy DataBlocks (Underlying tables/materialized views)
           liquibase \
             --classpath="/opt/liquibase/lib/DatabricksJDBC42.jar:/opt/liquibase/lib/liquibase-databricks.jar" \
             --url="${DATABRICKS_JDBC_URL}" \
@@ -73,4 +74,14 @@ jobs:
             --password="${DATABRICKS_TOKEN}" \
             --driver="com.databricks.client.jdbc.Driver" \
             --changelog-file="src/datablocks/schema_changes/datablock.changelog.yml" \
+            update
+
+          # 2. Deploy DataMarts (Static views sitting on top of DataBlocks)
+          liquibase \
+            --classpath="/opt/liquibase/lib/DatabricksJDBC42.jar:/opt/liquibase/lib/liquibase-databricks.jar" \
+            --url="${DATABRICKS_JDBC_URL}" \
+            --username="token" \
+            --password="${DATABRICKS_TOKEN}" \
+            --driver="com.databricks.client.jdbc.Driver" \
+            --changelog-file="src/datamarts/schema_changes/datamart.changelog.yml" \
             update
