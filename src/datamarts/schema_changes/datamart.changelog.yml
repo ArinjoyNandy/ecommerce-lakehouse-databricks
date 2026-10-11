@@ -7,8 +7,6 @@ databaseChangeLog:
   - changeSet:
       id: 101-create-v-mart-daily-executive-sales
       author: ecommerce-lakehouse
-      # runOnChange: true
-      runAlways: true
       comment: Aggregate daily sales KPIs from order lineage
       preConditions:
         - onFail: MARK_RAN
@@ -26,8 +24,6 @@ databaseChangeLog:
   - changeSet:
       id: 102-create-v-mart-logistics-regional-sla
       author: ecommerce-lakehouse
-      # runOnChange: true
-      runAlways: true
       comment: Regional fulfillment lead times and SLA breaches
       preConditions:
         - onFail: MARK_RAN
@@ -45,8 +41,6 @@ databaseChangeLog:
   - changeSet:
       id: 103-create-v-mart-freight-leakage-analysis
       author: ecommerce-lakehouse
-      # runOnChange: true
-      runAlways: true
       comment: Shipping cost burden ratio per product price tier
       preConditions:
         - onFail: MARK_RAN
@@ -64,8 +58,6 @@ databaseChangeLog:
   - changeSet:
       id: 104-create-v-mart-customer-segment-summary
       author: ecommerce-lakehouse
-      # runOnChange: true
-      runAlways: true
       comment: Aggregated customer count and spend by RFM cohort
       preConditions:
         - onFail: MARK_RAN
@@ -83,8 +75,6 @@ databaseChangeLog:
   - changeSet:
       id: 105-create-v-mart-seller-fulfillment-efficiency
       author: ecommerce-lakehouse
-      # runOnChange: true
-      runAlways: true
       comment: Merchant fulfillment performance and transit times
       preConditions:
         - onFail: MARK_RAN
@@ -102,8 +92,6 @@ databaseChangeLog:
   - changeSet:
       id: 106-create-v-mart-temporal-demand-profile
       author: ecommerce-lakehouse
-      # runOnChange: true
-      runAlways: true
       comment: Day of week and weekend purchasing distributions
       preConditions:
         - onFail: MARK_RAN
