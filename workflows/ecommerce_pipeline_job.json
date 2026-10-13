@@ -1,0 +1,65 @@
+{
+  "name": "ecommerce_medallion_pipeline",
+  "email_notifications": {
+    "no_alert_for_skipped_runs": false
+  },
+  "timeout_seconds": 3600,
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "task_bronze_ingestion",
+      "description": "Ingests raw CSV data from Managed Volumes into Bronze Delta tables",
+      "notebook_task": {
+        "notebook_path": "notebooks/01_bronze_ingest_runner",
+        "source": "GIT"
+      },
+      "job_cluster_key": "shared_pipeline_cluster"
+    },
+    {
+      "task_key": "task_silver_cdc_upsert",
+      "depends_on": [
+        {
+          "task_key": "task_bronze_ingestion"
+        }
+      ],
+      "description": "Applies data cleansing, schema casting, and Delta MERGE INTO CDC",
+      "notebook_task": {
+        "notebook_path": "notebooks/02_silver_cdc_runner",
+        "source": "GIT"
+      },
+      "job_cluster_key": "shared_pipeline_cluster"
+    },
+    {
+      "task_key": "task_gold_maintenance",
+      "depends_on": [
+        {
+          "task_key": "task_silver_cdc_upsert"
+        }
+      ],
+      "description": "Refreshes gold views and applies OPTIMIZE Z-ORDER compaction",
+      "notebook_task": {
+        "notebook_path": "notebooks/03_gold_maintenance_runner",
+        "source": "GIT"
+      },
+      "job_cluster_key": "shared_pipeline_cluster"
+    }
+  ],
+  "job_clusters": [
+    {
+      "job_cluster_key": "shared_pipeline_cluster",
+      "new_cluster": {
+        "spark_version": "14.3.x-scala2.12",
+        "node_type_id": "i3.xlarge",
+        "num_workers": 2,
+        "spark_conf": {
+          "spark.databricks.delta.preview.enabled": "true"
+        }
+      }
+    }
+  ],
+  "git_source": {
+    "git_url": "https://github.com/ArinjoyNandy/ecommerce-lakehouse-databricks",
+    "git_provider": "gitHub",
+    "git_branch": "main"
+  }
+}
