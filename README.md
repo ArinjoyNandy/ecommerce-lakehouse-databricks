@@ -5,6 +5,24 @@
 [![Databricks Unity Catalog](https://img.shields.io/badge/Catalog-Unity%20Catalog-blue)](https://databricks.com/)
 [![Delta Lake](https://img.shields.io/badge/Storage-Delta%20Lake%203.0-00ADD8)](https://delta.io/)
 
+---
+
+### ⚡ Quick Code Index
+
+Navigate directly to the core engineering implementations:
+
+| Architecture Layer | Directory / Artifact | Core Responsibilities |
+| :--- | :--- | :--- |
+| **Bronze (Raw Ingest)** | [`src/bronze/`](./src/bronze/) | Batch CSV landing into append-only Delta tables with metadata tracking |
+| **Silver (Cleansing & CDC)** | [`src/silver/`](./src/silver/) | Schema enforcement, null filtering, and idempotent `MERGE INTO` CDC engine |
+| **Gold (DataBlocks)** | [`src/datablocks/`](./src/datablocks/) | Curated entity models (`mv_datablock_sales_order_lineage`, `mv_datablock_customer_360`) |
+| **Gold (DataMarts)** | [`src/datamarts/`](./src/datamarts/) | Zero-join, declarative BI aggregation views (`v_mart_*`) |
+| **CI/CD & Migrations** | [`liquibase/` & `schema_changes/`](./src/datablocks/schema_changes/) | Liquibase changelogs, preconditions, and automated JDBC deployments |
+| **Orchestration** | [`notebooks/`](./notebooks/) & [`workflows/`](./workflows/) | Databricks Asset Bundle (`databricks.yml`) and Multi-Task Job definition |
+| **Unit Testing** | [`tests/`](./tests/) | PySpark transformation test fixtures and data quality assertions |
+
+---
+
 A Medallion Lakehouse platform built on Databricks, Delta Lake, and PySpark using the Brazilian E-Commerce dataset. Features declarative GitOps change management via **Liquibase**, idempotent **CDC upsert merges**, and an isolated **DataBlock / DataMart** modeling contract.
 
 ---
