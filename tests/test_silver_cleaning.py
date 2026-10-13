@@ -1,20 +1,10 @@
-import os
-import sys
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
+# tests/test_silver_cleaning.py
 import pytest
-from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType, StructField, StringType, DoubleType, TimestampType
 from datetime import datetime
+from pyspark.sql.types import StructType, StructField, StringType, TimestampType
 from src.silver.cleaning import clean_orders_data, clean_order_items_data
 
-@pytest.fixture(scope="session")
-def spark():
-    """Returns the active Databricks Spark Connect session."""
-    yield SparkSession.getActiveSession()
-
 def test_clean_orders_filters_null_and_parses_dates(spark):
-    # Sample bronze input schema
     schema = StructType([
         StructField("order_id", StringType(), True),
         StructField("customer_id", StringType(), True),
@@ -28,9 +18,7 @@ def test_clean_orders_filters_null_and_parses_dates(spark):
     ])
 
     test_data = [
-        # Valid order
         ("ord_001", "cust_001", " DELIVERED ", "2023-01-01 10:00:00", None, None, "2023-01-05 12:00:00", "2023-01-10 00:00:00", datetime.now()),
-        # Corrupt order (Null order_id)
         (None, "cust_002", "shipped", "2023-01-02 11:00:00", None, None, None, None, datetime.now())
     ]
 
@@ -38,11 +26,10 @@ def test_clean_orders_filters_null_and_parses_dates(spark):
     cleaned_df = clean_orders_data(raw_df)
     results = cleaned_df.collect()
 
-    # Assertions
     assert len(results) == 1, "Rows with NULL order_id must be filtered out"
     assert results[0]["order_id"] == "ord_001"
-    assert results[0]["order_status"] == "delivered", "Order status should be trimmed and lowercased"
-    assert isinstance(results[0]["order_purchase_timestamp"], datetime), "Timestamp must be parsed into datetime"
+    assert results[0]["order_status"] == "delivered", "Order status must be trimmed and lowercased"
+    assert isinstance(results[0]["order_purchase_timestamp"], datetime)
 
 def test_clean_order_items_handles_null_prices(spark):
     schema = StructType([
@@ -67,5 +54,5 @@ def test_clean_order_items_handles_null_prices(spark):
 
     assert len(results) == 2
     assert results[0]["price"] == 49.90
-    assert results[1]["price"] == 0.0, "Null price values must default to 0.0"
-    assert results[1]["freight_value"] == 0.0, "Null freight values must default to 0.0"
+    assert results[1]["price"] == 0.0
+    assert results[1]["freight_value"] == 0.0
