@@ -1,7 +1,17 @@
+import os
+import sys
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 import pytest
+from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, DoubleType, TimestampType
 from datetime import datetime
 from src.silver.cleaning import clean_orders_data, clean_order_items_data
+
+@pytest.fixture(scope="session")
+def spark():
+    """Returns the active Databricks Spark Connect session."""
+    yield SparkSession.getActiveSession()
 
 def test_clean_orders_filters_null_and_parses_dates(spark):
     # Sample bronze input schema

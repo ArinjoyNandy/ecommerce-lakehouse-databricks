@@ -49,8 +49,8 @@ def clean_order_items_data(bronze_order_item_df: DataFrame) -> DataFrame:
             F.col("product_id").cast("string"),
             F.col("seller_id").cast("string"),
             F.to_timestamp(F.col("shipping_limit_date")).alias("shipping_limit_date"),
-            F.coalesce(F.col("price").cast(DoubleType())).alias("price"),
-            F.coalesce(F.col("freight_value").cast(DoubleType())).alias("freight_value"),
+            F.coalesce(F.col("price").cast(DoubleType()), F.lit(0.0)).alias("price"),
+            F.coalesce(F.col("freight_value").cast(DoubleType()), F.lit(0.0)).alias("freight_value"),
             F.col("_ingested_at")
         )
         .filter(F.col("order_id").isNotNull() & F.col("order_item_id").isNotNull())
