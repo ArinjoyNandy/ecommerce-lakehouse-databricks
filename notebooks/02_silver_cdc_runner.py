@@ -33,7 +33,7 @@ from src.silver.cdc_engine import upsert_orders_silver, overwrite_silver_table
 # 1. Read Bronze tables
 bronze_orders = spark.read.table(f"{catalog_name}.bronze.raw_orders")
 bronze_items = spark.read.table(f"{catalog_name}.bronze.raw_order_items")
-bronze_custs = spark.table(f"{catalog_name}.bronze.raw_customers")
+bronze_custs = spark.read.table(f"{catalog_name}.bronze.raw_customers")
 
 # 2. Clean data
 silver_orders_df = clean_orders_data(bronze_orders)
@@ -45,7 +45,7 @@ silver_custs_df = clean_customers_data(bronze_custs)
 # DBTITLE 1,Merge Orders and Write Dimension Tables
 # 3. Apply CDC Merge to Orders
 orders_target = f"{catalog_name}.silver.orders"
-print("upserting orders into {orders_target}...")
+print(f"upserting orders into {orders_target}...")
 upsert_orders_silver(spark, orders_target, silver_orders_df)
 
 # 4. Write Dimension and Line-Item Tables

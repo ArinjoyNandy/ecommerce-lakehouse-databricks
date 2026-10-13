@@ -1,0 +1,22 @@
+{
+  "environment": "dev",
+  "catalog": "ecommerce_dev",
+  "schemas": {
+    "bronze": "bronze",
+    "silver": "silver",
+    "gold": "gold"
+  },
+  "storage": {
+    "raw_landing_volume": "/Volumes/ecommerce_dev/bronze_stage/raw_landing"
+  },
+  "tables": {
+    "orders": "orders",
+    "order_items": "order_items",
+    "customers": "customers",
+    "datablock_sales_lineage": "datablock_sales_order_lineage",
+    "datablock_customer_360": "datablock_customer_360"
+  },
+  "optimization": {
+    "vacuum_retention_hours": 168
+  }
+}
